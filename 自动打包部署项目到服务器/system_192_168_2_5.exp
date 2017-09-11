@@ -1,0 +1,69 @@
+#!/usr/bin/expect
+
+# ssh access remote pc
+spawn ssh -l root 192.168.2.5
+
+# if ask yes or no, send yes
+# if ask password, send password 
+expect {
+  "yes/no" { send "yes\r"; exp_continue}
+  "password:" { send "chifaner159357\r" }
+}
+
+#sleep wait login success, because notwork has delay
+sleep 3
+#testing a command 
+send "uname -a\r"
+#go to work dir
+send "cd /mnt/service/chifaner/system\r"
+#print work dir
+send "pwd\r"
+#create backup dir
+#send "if [-d `date \"+%Y%m%d\"`]; then echo \"exsits\"; else  mkdir `date \"+%Y%m%d\"`; fi\r"
+send "mkdir -p `date \"+%Y%m%d\"`\r"
+#move old system.tar to backup dir
+send "mv -f system.tar `date \"+%Y%m%d\"`\r"
+#exit
+send "exit\r"
+sleep 2
+#scp to 192.168.2.5
+spawn scp system.tar root@192.168.2.5:/mnt/service/chifaner/system/
+expect {
+  "yes/no" { send "yes\r"; exp_continue }
+  "password" { send "chifaner159357\r" }
+}
+#wait 60s for scp
+sleep 60
+#ssh access remote pc
+spawn ssh -l root 192.168.2.5
+expect {
+  "yes/no" { send "yes\r"; exp_continue }
+  "password" { send "chifaner159357\r" }
+}
+# wait remote logon
+sleep 3
+send "cd /mnt/service/chifaner/system\r"
+send "pwd\r"
+send "ls -la\r"
+
+#kill original process
+send "kill -9 `ps -ef | grep chifaner.system | grep \"java -cp lib -jar com.fantong\" | sed 's/ \\+/ /g' | cut -d \" \" -f2`\r"
+#move other old file to backup dir
+send "mv -f lib `date \"+%Y%m%d\"`\r"
+sleep 3
+send "mv -f com.fantong.chifaner.system.jar `date \"+%Y%m%d\"`\r"
+sleep 3
+send "mv -f D\\: `date \"+%Y%m%d\"`\r"
+#untar
+send "tar -xf system.tar\r"
+#wait untar success
+sleep 3
+#rerun system module
+send "./start.sh\r"
+sleep 10
+send "exit\r"
+
+#holding the console
+#interact
+
+
