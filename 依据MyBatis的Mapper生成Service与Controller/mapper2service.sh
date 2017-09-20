@@ -7,7 +7,10 @@ then
 fi
 file=$1
 tofile=$2
+service_dir=$3
+service_dir=${service_dir//\//.}
 cp -v $file $tofile
+sed -i "s/^package .*;$/package $service_dir;/" $tofile
 sed -i 's/mapper/service/' $tofile
 sed -i 's/Mapper/Service/' $tofile
 sed -i 's/import org.apache.ibatis.annotations.Param;//' $tofile

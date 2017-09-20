@@ -8,6 +8,7 @@ fi
 base_dir=$1
 p_name=$2
 i_name=$3
+mapper_oname=$4
 i_file=${base_dir}${p_name//./\/}/${i_name}.java
 impl=${base_dir}${p_name//./\/}/impl/${i_name}Impl.java
 echo $i_file
@@ -21,7 +22,8 @@ sed -i 's/);/){}/g' $impl
 sed -i "/import java.util.List/a import ${p_name}.${i_name};" $impl
 mp_name=${p_name/service/mapper}
 mp_file=${i_name/Service/Mapper}
-sed -i "/import java.util.List/a import ${mp_name}.${mp_file};" $impl
+# sed -i "/import java.util.List/a import ${mp_name}.${mp_file};" $impl
+sed -i "/import java.util.List/a import ${mapper_oname//.java/};" $impl
 
 sed -i "/import java.util.List/a import org.springframework.beans.factory.annotation.Autowired;" $impl
 sed -i "/import java.util.List/a import org.springframework.stereotype.Service;" $impl
